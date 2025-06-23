@@ -2,6 +2,7 @@ package gradleProject.shop3.domain;
 
 import gradleProject.shop3.logic.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,5 +11,8 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Integer> {
 
 	List<Item> findAll();
+
+	@Query("select coalesce(max(i.id),0) from Item i")
+	int findmaxId();
 
 }

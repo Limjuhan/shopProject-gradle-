@@ -1,17 +1,20 @@
 package gradleProject.shop3.controller;
 
 import gradleProject.shop3.logic.Item;
+import gradleProject.shop3.service.ShopService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model; // ModelAndView 대신 Model 사용
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-// import org.springframework.web.servlet.ModelAndView; // 이제 필요 없음
-import gradleProject.shop3.service.ShopService;
 
-import javax.sql.DataSource; // jakarta.sql.DataSource 대신 javax.sql.DataSource 그대로 사용
+import javax.sql.DataSource;
 import java.util.List;
 
 @Controller
@@ -28,8 +31,7 @@ public class ItemController {
 		this.dataSource = dataSource; // 생성자 필드 주입
 	}
 
-	// http://localhost:8083/item/list 요청시 호출되는 메서드 (기본 컨텍스트 경로 가정)
-	@GetMapping("list") // GET 방식 요청시 호출
+	@GetMapping("list")
 	public String list(Model model, HttpSession session) {
 
 		// itemList : item 테이블의 모든 정보를 저장 객체
@@ -63,6 +65,7 @@ public class ItemController {
 
 		return "item/update";
 	}
+
 	@GetMapping("delete")
 	public String delete(@RequestParam Integer id, Model model) {
 		Item item = service.getItem(id);
@@ -72,46 +75,40 @@ public class ItemController {
 		return "item/delete";
 	}
 
+	@GetMapping("create") //GET 방식 요청
+	public String create(Model model) {
+	 model.addAttribute("item", new Item());
+	 model.addAttribute("title", "상품 등록");
+	 return "item/create";
+	}
 
+	@PostMapping("create") //Post 방식 요청
+	public String register(@Valid Item item, BindingResult bresult,
+						   HttpServletRequest request, Model model) { // Model 추가
+	 if(bresult.hasErrors()) {
+		model.addAttribute("title", "상품 등록 오류"); // 오류 페이지 제목
+		return "item/create";
+	 }
+	 service.itemCreate(item,request);
+	 return "redirect:/item/list"; // 리다이렉트 시에는 컨텍스트 경로 주의 (/item/list)
+	}
 
+	@PostMapping("update")
+	public String update(@Valid Item item, BindingResult bresult,
+		HttpServletRequest request, Model model) { // Model 추가
+	 if(bresult.hasErrors()) {
+		model.addAttribute("title", "상품 수정 오류");
+		return "item/update"; // resources/templates/item/update.html
+	 }
+	 service.itemUpdate(item,request);
+	 return "redirect:/item/list";
+	}
 
-
-	// 아래 주석 처리된 메서드들도 Model을 사용하고 템플릿 이름 또는 redirect 문자열을 반환하도록 수정해야 합니다.
-
-//  @GetMapping("create") //GET 방식 요청
-//  public String create(Model model) {
-//     model.addAttribute("item", new Item());
-//     model.addAttribute("title", "상품 등록");
-//     return "item/create"; // resources/templates/item/create.html
-//  }
-//
-//  @PostMapping("create") //Post 방식 요청
-//  public String register(@Valid Item item, BindingResult bresult,
-//        HttpServletRequest request, Model model) { // Model 추가
-//     if(bresult.hasErrors()) {
-//        model.addAttribute("title", "상품 등록 오류"); // 오류 페이지 제목
-//        return "item/create";
-//     }
-//     service.itemCreate(item,request);
-//     return "redirect:/item/list"; // 리다이렉트 시에는 컨텍스트 경로 주의 (/item/list)
-//  }
-//
-//  @PostMapping("update")
-//  public String update(@Valid Item item, BindingResult bresult,
-//        HttpServletRequest request, Model model) { // Model 추가
-//     if(bresult.hasErrors()) {
-//        model.addAttribute("title", "상품 수정 오류");
-//        return "item/update"; // resources/templates/item/update.html
-//     }
-//     service.itemUpdate(item,request);
-//     return "redirect:/item/list";
-//  }
-//
-//  @PostMapping("delete")
-//  public String delete(@RequestParam Integer id) {
-//     service.itemDelete(id);
-//     return "redirect:/item/list";
-//  }
+	@PostMapping("delete")
+	public String delete(@RequestParam Integer id) {
+	 service.itemDelete(id);
+	 return "redirect:/item/list";
+	}
 
 
 }
