@@ -1,0 +1,79 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'gradleProject'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+
+	// Valid
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// MyBatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+
+	// AspectJ 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// WebSocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	// mail 설정
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// httpclient
+	implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+
+	// StringUtils
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	// jsoup
+	implementation 'org.jsoup:jsoup:1.20.1'
+
+	// json-simple
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat' // WAR 패키징 시 필요
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Thymeleaf Layout Dialect
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
+
+	// 기존 Gradle 파일에 있던 의존성 유지 (필요 없으면 삭제 가능)
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

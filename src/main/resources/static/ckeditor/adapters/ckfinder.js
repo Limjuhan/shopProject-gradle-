@@ -1,0 +1,1 @@
+// CKFinder adapter placeholder

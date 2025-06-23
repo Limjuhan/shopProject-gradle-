@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}"> <head>
+    <title th:text="${title} ?: '상품 목록'">상품 목록</title> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <th:block layout:fragment="css_js_head">
+        <style>
+            /* 기존 body 백그라운드 색상은 레이아웃에 있으므로 여기서 제거 */
+            /* body { background-color: #f8f9fa; } */
+            .container {
+                margin-top: 30px;
+                margin-bottom: 30px;
+            }
+            .table {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            .table-item {
+                table-layout: fixed;
+            }
+            .table th, .table td {
+                vertical-align: middle;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .btn-custom {
+                margin-right: 10px;
+            }
+            .page-title {
+                margin-bottom: 20px;
+                font-weight: bold;
+                color: #343a40;
+            }
+            .table-item th:nth-child(1), .table-item td:nth-child(1) {
+                width: 10%;
+                min-width: 60px;
+            }
+            .table-item th:nth-child(2), .table-item td:nth-child(2) {
+                width: 45%;
+                min-width: 150px;
+            }
+            .table-item th:nth-child(3), .table-item td:nth-child(3) {
+                width: 20%;
+                min-width: 100px;
+                padding-right: 15px;
+            }
+            .table-item th:nth-child(4), .table-item td:nth-child(4) {
+                width: 12.5%;
+                min-width: 80px;
+            }
+            .table-item th:nth-child(5), .table-item td:nth-child(5) {
+                width: 12.5%;
+                min-width: 80px;
+            }
+            .table-item .btn {
+                width: 100%;
+                white-space: nowrap;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <h2 class="page-title">상품 목록</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <a th:href="@{/item/create}" class="btn btn-primary btn-custom">
+                    <i class="bi bi-plus-circle"></i> 상품 등록
+                </a>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/user/mypage(userid=${loginUser?.userId})}" class="btn btn-primary btn-custom">
+                    <i class="bi bi-person"></i> MyPage
+                </a>
+                <a th:href="@{/cart/cartView}" class="btn btn-success btn-custom">
+                    <i class="bi bi-cart"></i> 장바구니
+                </a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-item">
+                <thead class="table-dark">
+                <tr>
+                    <th scope="col">상품ID</th>
+                    <th scope="col">상품명</th>
+                    <th scope="col">가격</th>
+                    <th scope="col">수정</th>
+                    <th scope="col">삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item, iterStat : ${itemList}">
+                    <td th:text="${item.id}"></td>
+                    <td>
+                        <a th:href="@{/item/detail(id=${item.id})}"
+                           class="text-decoration-none text-primary"
+                           th:text="${item.name}"></a>
+                    </td>
+                    <td th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')} + ' 원'"></td>
+                    <td>
+                        <a th:href="@{/item/update(id=${item.id})}"
+                           class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i> 수정
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{/item/delete(id=${item.id})}"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('정말 삭제하시겠습니까?');">
+                            <i class="bi bi-trash"></i> 삭제
+                        </a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(itemList)}">
+                    <td colspan="5">등록된 상품이 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="css_js_body">
+</th:block>
+</body>
+</html>
