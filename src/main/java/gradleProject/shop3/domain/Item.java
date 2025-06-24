@@ -1,4 +1,4 @@
-package gradleProject.shop3.logic;
+package gradleProject.shop3.domain;
 
 import java.util.Objects;
 

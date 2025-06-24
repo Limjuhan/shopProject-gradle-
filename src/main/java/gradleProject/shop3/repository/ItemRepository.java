@@ -1,6 +1,6 @@
-package gradleProject.shop3.domain;
+package gradleProject.shop3.repository;
 
-import gradleProject.shop3.logic.Item;
+import gradleProject.shop3.domain.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

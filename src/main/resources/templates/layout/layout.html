@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"> <head>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
   <meta charset="UTF-8" />
   <title th:text="${title}">기본 타이틀</title> <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -230,7 +230,8 @@
 </button>
 <div id="chat-box-container" class="position-fixed bottom-0 end-0 m-4" style="z-index:1060;"></div>
 
-<script th:inline="javascript"> const toggleBtn = document.getElementById("toggleSidebar");
+<script th:inline="javascript">
+const toggleBtn = document.getElementById("toggleSidebar");
 const sidebar = document.getElementById("sidebar");
 const mainContent = document.getElementById("mainContent");
 
@@ -240,8 +241,8 @@ toggleBtn.addEventListener("click", () => {
 });
 
 $(function() {
-  getSido1();
-  getLogo();
+  // getSido1();
+  // getLogo();
 
   let chatOpen = false;
   $("#chat-button").on("click", function(){
@@ -300,9 +301,9 @@ function getText(name) {
 
 function getLogo() {
   $.ajax({
-    url: /*[[@{/ajax/logo}]]*/ "/ajax/logo",
+    url: /*[[@{/ajax/logo}]]*/"/ajax/logo",
     success: function(json) {
-      var html = '<img src=' + json.logo + ' />';
+      let html = '<img src=' + json.logo + ' />';
       $("#footer-info").prepend(html);
     },
     error: function(e) {

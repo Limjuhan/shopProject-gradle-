@@ -1,11 +1,10 @@
 package gradleProject.shop3.controller;
 
-import gradleProject.shop3.logic.Item;
+import gradleProject.shop3.domain.Item;
 import gradleProject.shop3.service.ShopService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,21 +13,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @Controller
 @RequestMapping("item")
 public class ItemController {
 
-	private final DataSource dataSource; // 현재 사용되지 않으므로 필요에 따라 제거 가능
-
-	@Autowired //ShopService 객체 주입
 	private ShopService service;
 
-	// DataSource는 생성자 주입을 유지하되, 현재 사용하지 않으면 제거를 고려
-	ItemController(DataSource dataSource) {
-		this.dataSource = dataSource; // 생성자 필드 주입
+	public ItemController(ShopService service) {
+		this.service = service;
 	}
 
 	@GetMapping("list")

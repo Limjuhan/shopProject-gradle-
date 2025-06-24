@@ -1,7 +1,7 @@
 package gradleProject.shop3.service;
 
-import gradleProject.shop3.domain.ItemRepository;
-import gradleProject.shop3.logic.Item;
+import gradleProject.shop3.repository.ItemRepository;
+import gradleProject.shop3.domain.Item;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
