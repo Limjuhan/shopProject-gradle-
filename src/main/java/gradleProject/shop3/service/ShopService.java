@@ -15,7 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.List;
 
-@Service 
+@Service
+@Transactional
 public class ShopService {
 
 	@Autowired  
@@ -94,7 +95,7 @@ public class ShopService {
 //
 //		return sale;
 //	}
-	@Transactional
+
 	public List<Sale> saleList(String userid) {
 		// userid 사용자가 주문정보 목록
 		List<Sale> list = saleRepository.findByUserid(userid);

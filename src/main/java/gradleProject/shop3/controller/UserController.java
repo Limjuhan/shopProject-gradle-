@@ -90,7 +90,9 @@ public class UserController {
 			String cipherPass = CipherUtil.makehash(userDto.getPassword());
 			userDto.setPassword(cipherPass);
 			String cipherUserid = CipherUtil.makehash(userDto.getUserid());
+			System.out.println("cipherUserid(userid로 해쉬값만든결과) = " + cipherUserid);
 			String cipherEmail = CipherUtil.encrypt(userDto.getEmail(), cipherUserid);
+			System.out.println("cipherEmail(email,해쉬id 암호화처리결과) = " + cipherEmail);
 			userDto.setEmail(cipherEmail);
 
 			User user = userMapper.toEntity(userDto);
@@ -127,7 +129,6 @@ public class UserController {
 		}
 
 		User dbUser = userService.selectUser(user.getUserid());
-
 		if(dbUser == null) { // 아이디 없음
 			bresult.reject("error.login.id", "존재하지 않는 아이디입니다.");
 			return "user/login";
@@ -151,6 +152,7 @@ public class UserController {
 		model.addAttribute("title", "내 정보"); // 페이지 제목 설정
 
 		User user = userService.selectUser(userid);
+		user.setEmail(userService.decryptEmail(user));
 		List<Sale> salelist = shopService.saleList(userid);
 
 		model.addAttribute("user", user);

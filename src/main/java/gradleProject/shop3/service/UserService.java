@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class UserService {
 
 //	@Value("${resources.dir}")
@@ -16,21 +17,23 @@ public class UserService {
 	@Autowired
 	UserRepository userRepository;
 
+
 	public void userInsert(User user) {
 		userRepository.save(user);
 	}
 
 	public User selectUser(String userid) {
-		User user = userRepository.findById(userid).get();
-		System.err.println("user객체확인: " + user);
-		System.out.println("email = " + user.getEmail());
+		return userRepository.findById(userid).get();
+	}
+
+	public String decryptEmail(User user) {
 		try{
 			String hashId = CipherUtil.makehash(user.getUserid());
 			String email = CipherUtil.decrypt(user.getEmail(), hashId);
-			user.setEmail(email);
-			return user;
+			return email;
 		}
 		catch (Exception e) {
+			System.err.println("이메일 복호화 오류");
 			e.printStackTrace();
 		}
 		return null;
