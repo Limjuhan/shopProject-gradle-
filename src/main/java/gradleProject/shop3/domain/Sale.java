@@ -1,6 +1,8 @@
 package gradleProject.shop3.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,22 +14,21 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@ToString(exclude = "itemList") // toString에서 StackOverflowError 방지
+@ToString
 public class Sale {
 	@Id
 	private int saleid;
+
 	private Date saledate;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "userid")
-	private User user;
+	private String userid; // 외래키 직접 들고 있기
 
-	@OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@Transient
 	private List<SaleItem> itemList = new ArrayList<>();
 
 	public int getTotal() {
 		return itemList.stream()
+				.filter(s -> s.getItem() != null)
 				.mapToInt(s -> s.getItem().getPrice() * s.getQuantity())
 				.sum();
 	}

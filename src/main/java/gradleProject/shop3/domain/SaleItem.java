@@ -21,17 +21,10 @@ public class SaleItem {
 	private int seq;
 
 	private int itemid;
-
 	private int quantity;
 
-	@ManyToOne
-	@JoinColumn(name = "id", insertable = false, updatable = false)
 	@Transient
-	private Item item;
-
-	@ManyToOne
-	@JoinColumn(name = "saleid", insertable = false, updatable = false)
-	private Sale sale;
+	private Item item; // 조회 시 직접 넣을 예정
 
 	public SaleItem(int saleid, int seq, ItemSet itemSet) {
 		this.saleid = saleid;

@@ -133,13 +133,18 @@ public class UserController {
 			return "user/login";
 		}
 
-		if(user.getPassword().equals(dbUser.getPassword())) { // 비밀번호 일치
-			return "redirect:/user/mypage?userid=" + user.getUserid(); // 마이페이지로 리다이렉트 (절대 경로)
-		} else { // 비밀번호 불일치
-			bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
-			return "user/login";
-		}
-	}
+        try {
+            if(CipherUtil.makehash(user.getPassword()).equals(dbUser.getPassword())) { // 비밀번호 일치
+                return "redirect:/user/mypage?userid=" + user.getUserid();
+            } else { // 비밀번호 불일치
+                bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
+                return "user/login";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		return null;
+    }
 
 	@RequestMapping("mypage")
 	public String idCheckMypage(@RequestParam("userid") String userid, Model model) {
@@ -147,13 +152,11 @@ public class UserController {
 
 		User user = userService.selectUser(userid);
 		List<Sale> salelist = shopService.saleList(userid);
-		System.err.println("user확인" + user.toString());
-		System.err.println("salelist확인" + salelist.toString());
 
 		model.addAttribute("user", user);
 		model.addAttribute("salelist", salelist);
 
-		return "user/mypage"; // user/mypage 뷰 반환
+		return "user/mypage";
 	}
 
 //	@RequestMapping("logout")

@@ -9,6 +9,7 @@ import gradleProject.shop3.repository.SaleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -93,11 +94,10 @@ public class ShopService {
 //
 //		return sale;
 //	}
-//
+	@Transactional
 	public List<Sale> saleList(String userid) {
-
 		// userid 사용자가 주문정보 목록
-		List<Sale> list = saleRepository.findByUserUserid(userid);
+		List<Sale> list = saleRepository.findByUserid(userid);
 
 		for (Sale s : list) {//Sale 순회
 			// Sale객체 List<SaleItem>(주문상품모음리스트)에 데이터 할당.
@@ -105,6 +105,7 @@ public class ShopService {
 			// 1. saleitem의 saleid가 Sale의 saleid를 참조하므로
 			//    saleid로 saleitem에서 데이터 가져옴
 			List<SaleItem> saleItemList = saleItemRepository.findBySaleid(s.getSaleid());
+
 			// 2. 주문상품을 모아둔saleItemList을 순회하며 Item정보를 조회하여 Item데이터 세팅
 			for (SaleItem si : saleItemList) {
 				Item item = itemRepository.findById(si.getItemid());
