@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"> <head>
+  <meta charset="UTF-8">
+  <title>사용자 등록</title>
+
+  <th:block layout:fragment="css_js_head">
+  </th:block>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">사용자 등록</h4>
+          </div>
+          <div class="card-body">
+
+            <form th:object="${user}" th:action="@{/user/join}" method="post">
+
+              <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+              </div>
+
+              <div class="mb-3">
+                <label for="userid" class="form-label">아이디</label>
+                <input type="text" id="userid" th:field="*{userid}" class="form-control" />
+                <div th:if="${#fields.hasErrors('userid')}" th:errors="*{userid}" class="text-danger"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <input type="password" id="password" th:field="*{password}" class="form-control" />
+                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="username" class="form-label">이름</label>
+                <input type="text" id="username" th:field="*{username}" class="form-control" />
+                <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-danger"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="phoneno" class="form-label">전화번호</label>
+                <input type="text" id="phoneno" th:field="*{phoneno}" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label for="postcode" class="form-label">우편번호</label>
+                <input type="text" id="postcode" th:field="*{postcode}" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label for="address" class="form-label">주소</label>
+                <input type="text" id="address" th:field="*{address}" class="form-control" />
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" />
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="birthday" class="form-label">생년월일</label>
+                <input type="date" id="birthday" th:field="*{birthday}" class="form-control" />
+                <div th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}" class="text-danger"></div>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary me-2">회원가입</button>
+                <button type="reset" class="btn btn-secondary">초기화</button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<th:block layout:fragment="css_js_body">
+</th:block>
+
+</body>
+</html>

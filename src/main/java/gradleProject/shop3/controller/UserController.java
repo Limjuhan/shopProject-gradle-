@@ -1,90 +1,92 @@
-//package gradleProject.shop3.controller;
-//
-//import gradleProject.shop3.service.ShopService;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpSession;
-//import jakarta.validation.Valid;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.dao.DataIntegrityViolationException;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.util.StringUtils;
-//import org.springframework.validation.BindingResult;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.security.SecureRandom;
-//import java.util.List;
-//
-//@Controller
-//@RequestMapping("user")
-//public class UserController {
-//
-//	@Autowired
-//	private UserService service;
+package gradleProject.shop3.controller;
+
+import gradleProject.shop3.domain.User;
+import gradleProject.shop3.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.SecureRandom;
+
+@Controller
+@RequestMapping("user")
+public class UserController {
+
+	@Autowired
+	private UserService service;
 //
 //	@Autowired
 //	private ShopService shopService;
-//
-//	// BoardController 의존성 제거 (필요 없는 경우)
-//    /*
-//    private final BoardController boardController;
-//    UserController(BoardController boardController) {
-//        this.boardController = boardController;
-//    }
-//    */
-//
-//	@GetMapping("*") // GET 방식 모든 요청시 호출 (회원가입/로그인 폼 등)
-//	public String form(Model model, HttpSession session, HttpServletRequest request) {
-//		User loginUser = (User) session.getAttribute("loginUser");
-//
-//		// 로그인 상태인 경우 마이페이지로 리다이렉트
-//		if (loginUser != null && StringUtils.hasText(loginUser.getUserid())) {
-//			return "redirect:/user/mypage?userid=" + loginUser.getUserid();
-//		}
-//
-//		// 현재 요청 경로에 따라 적절한 뷰 설정 (더 명확하게 분리하는 것이 좋음)
-//		// 예를 들어, /user/join 요청은 user/join 뷰, /user/login 요청은 user/login 뷰
-//		String requestURI = request.getRequestURI();
-//		if (requestURI.endsWith("/user/join")) {
-//			model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
-//			model.addAttribute("title", "회원가입");
-//			return "user/join";
-//		} else if (requestURI.endsWith("/user/login")) {
-//			model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
-//			model.addAttribute("title", "로그인");
-//			return "user/login";
-//		} else {
-//			// 그 외의 * 요청에 대한 기본 처리
-//			model.addAttribute("user", new User());
-//			model.addAttribute("title", "회원가입"); // 기본적으로 회원가입 폼을 보여주는 것으로 가정
-//			return "user/join";
-//		}
-//	}
-//
-//	@PostMapping("join")
-//	public String userAdd(@Valid User user, BindingResult bresult, Model model) {
-//		model.addAttribute("title", "회원가입"); // 페이지 제목 설정
-//
-//		if(bresult.hasErrors()) {
-//			bresult.reject("error.input.user", "입력 값을 확인해 주세요."); // 전반적인 입력 오류
-//			return "user/join"; // 오류 발생 시 다시 user/join 뷰로
-//		}
-//
-//		try {
-//			service.userInsert(user);
-//		} catch(DataIntegrityViolationException e) { // 키값 중복된 경우 (아이디 중복)
-//			e.printStackTrace();
-//			bresult.reject("error.duplicate.user", "이미 존재하는 아이디입니다."); // 아이디 중복 오류
-//			return "user/join";
-//		} catch(Exception e) { // 기타 예외
-//			e.printStackTrace();
-//			bresult.reject("error.join.failed", "회원가입 중 알 수 없는 오류가 발생했습니다."); // 일반적인 회원가입 실패 메시지
-//			return "user/join";
-//		}
-//
-//		return "redirect:/user/login"; // 성공 시 로그인 페이지로 리다이렉트 (절대 경로)
-//	}
-//
+
+	// BoardController 의존성 제거 (필요 없는 경우)
+    /*
+    private final BoardController boardController;
+    UserController(BoardController boardController) {
+        this.boardController = boardController;
+    }
+    */
+
+	@GetMapping("*") // GET 방식 모든 요청시 호출 (회원가입/로그인 폼 등)
+	public String form(Model model, HttpSession session, HttpServletRequest request) {
+		User loginUser = (User) session.getAttribute("loginUser");
+
+		// 로그인 상태인 경우 마이페이지로 리다이렉트
+		if (loginUser != null && StringUtils.hasText(loginUser.getUserid())) {
+			return "redirect:/user/mypage?userid=" + loginUser.getUserid();
+		}
+
+		// 현재 요청 경로에 따라 적절한 뷰 설정 (더 명확하게 분리하는 것이 좋음)
+		// 예를 들어, /user/join 요청은 user/join 뷰, /user/login 요청은 user/login 뷰
+		String requestURI = request.getRequestURI();
+		if (requestURI.endsWith("/user/join")) {
+			model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
+			model.addAttribute("title", "회원가입");
+			return "user/join";
+		} else if (requestURI.endsWith("/user/login")) {
+			model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
+			model.addAttribute("title", "로그인");
+			return "user/login";
+		} else {
+			// 그 외의 * 요청에 대한 기본 처리
+			model.addAttribute("user", new User());
+			model.addAttribute("title", "회원가입"); // 기본적으로 회원가입 폼을 보여주는 것으로 가정
+			return "user/join";
+		}
+	}
+
+	@PostMapping("join")
+	public String userAdd(@Valid User user, BindingResult bresult, Model model) {
+		model.addAttribute("title", "회원가입"); // 페이지 제목 설정
+
+		if(bresult.hasErrors()) {
+			bresult.reject("error.input.user", "입력 값을 확인해 주세요."); // 전반적인 입력 오류
+			return "user/join"; // 오류 발생 시 다시 user/join 뷰로
+		}
+
+		try {
+			service.userInsert(user);
+		} catch(DataIntegrityViolationException e) { // 키값 중복된 경우 (아이디 중복)
+			e.printStackTrace();
+			bresult.reject("error.duplicate.user", "이미 존재하는 아이디입니다."); // 아이디 중복 오류
+			return "user/join";
+		} catch(Exception e) { // 기타 예외
+			e.printStackTrace();
+			bresult.reject("error.join.failed", "회원가입 중 알 수 없는 오류가 발생했습니다."); // 일반적인 회원가입 실패 메시지
+			return "user/join";
+		}
+
+		return "redirect:/user/login"; // 성공 시 로그인 페이지로 리다이렉트 (절대 경로)
+	}
+
 //	@PostMapping("login")
 //	public String login(@Valid User user, BindingResult bresult, Model model, HttpSession session) {
 //		model.addAttribute("title", "로그인"); // 페이지 제목 설정
@@ -311,15 +313,15 @@
 //			bresult.rejectValue("phoneno", "error.required.phoneno", "전화번호를 입력해 주세요.");
 //		}
 //	}
-//
-//	// 6자리 임시 비밀번호 생성
-//	private String generateRandomPassword() {
-//		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-//		SecureRandom random = new SecureRandom();
-//		StringBuilder sb = new StringBuilder(6);
-//		for (int i = 0; i < 6; i++) {
-//			sb.append(characters.charAt(random.nextInt(characters.length())));
-//		}
-//		return sb.toString();
-//	}
-//}
+
+	// 6자리 임시 비밀번호 생성
+	private String generateRandomPassword() {
+		String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		SecureRandom random = new SecureRandom();
+		StringBuilder sb = new StringBuilder(6);
+		for (int i = 0; i < 6; i++) {
+			sb.append(characters.charAt(random.nextInt(characters.length())));
+		}
+		return sb.toString();
+	}
+}
