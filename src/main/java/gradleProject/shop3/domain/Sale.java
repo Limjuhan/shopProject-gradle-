@@ -1,27 +1,34 @@
 package gradleProject.shop3.domain;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@Entity
 @Getter
 @Setter
-@ToString
-public class Sale {// 주문정보
-	
+@ToString(exclude = "itemList") // toString에서 StackOverflowError 방지
+public class Sale {
+	@Id
 	private int saleid;
-	private String userid;
 	private Date saledate;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "userid")
 	private User user;
+
+	@OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@Transient
 	private List<SaleItem> itemList = new ArrayList<>();
-	
+
 	public int getTotal() {
 		return itemList.stream()
-				.mapToInt(s->s.getItem().getPrice() * s.getQuantity())
+				.mapToInt(s -> s.getItem().getPrice() * s.getQuantity())
 				.sum();
 	}
 }

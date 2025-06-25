@@ -66,6 +66,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// MapStruct 런타임 라이브러리
+	implementation 'org.mapstruct:mapstruct:1.6.2'
+
+	// 애너테이션 프로세서 (코드 생성용)
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+
 	// Thymeleaf Layout Dialect
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
 

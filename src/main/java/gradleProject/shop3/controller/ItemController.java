@@ -1,6 +1,8 @@
 package gradleProject.shop3.controller;
 
 import gradleProject.shop3.domain.Item;
+import gradleProject.shop3.dto.ItemDto;
+import gradleProject.shop3.mapper.ItemMapper;
 import gradleProject.shop3.service.ShopService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -19,10 +21,12 @@ import java.util.List;
 @RequestMapping("item")
 public class ItemController {
 
-	private ShopService service;
+	private final ShopService service;
+	private final ItemMapper itemMapper;
 
-	public ItemController(ShopService service) {
+	public ItemController(ShopService service, ItemMapper itemMapper) {
 		this.service = service;
+        this.itemMapper = itemMapper;
 	}
 
 	@GetMapping("list")
@@ -69,31 +73,35 @@ public class ItemController {
 		return "item/delete";
 	}
 
-	@GetMapping("create") //GET 방식 요청
+	@GetMapping("create")
 	public String create(Model model) {
 	 model.addAttribute("item", new Item());
 	 model.addAttribute("title", "상품 등록");
 	 return "item/create";
 	}
 
-	@PostMapping("create") //Post 방식 요청
-	public String register(@Valid Item item, BindingResult bresult,
-						   HttpServletRequest request, Model model) { // Model 추가
+	@PostMapping("create")
+	public String register(@Valid ItemDto itemDto, BindingResult bresult,
+						   HttpServletRequest request, Model model) {
 	 if(bresult.hasErrors()) {
-		model.addAttribute("title", "상품 등록 오류"); // 오류 페이지 제목
+		model.addAttribute("title", "상품 등록 오류");
 		return "item/create";
 	 }
+
+	 Item item = itemMapper.toEntity(itemDto);
+
 	 service.itemCreate(item,request);
 	 return "redirect:/item/list"; // 리다이렉트 시에는 컨텍스트 경로 주의 (/item/list)
 	}
 
 	@PostMapping("update")
-	public String update(@Valid Item item, BindingResult bresult,
+	public String update(@Valid ItemDto itemDto, BindingResult bresult,
 		HttpServletRequest request, Model model) { // Model 추가
 	 if(bresult.hasErrors()) {
 		model.addAttribute("title", "상품 수정 오류");
 		return "item/update"; // resources/templates/item/update.html
 	 }
+	 Item item = itemMapper.toEntity(itemDto);
 	 service.itemUpdate(item,request);
 	 return "redirect:/item/list";
 	}

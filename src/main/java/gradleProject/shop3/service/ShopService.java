@@ -1,7 +1,11 @@
 package gradleProject.shop3.service;
 
-import gradleProject.shop3.repository.ItemRepository;
 import gradleProject.shop3.domain.Item;
+import gradleProject.shop3.domain.Sale;
+import gradleProject.shop3.domain.SaleItem;
+import gradleProject.shop3.repository.ItemRepository;
+import gradleProject.shop3.repository.SaleItemRepository;
+import gradleProject.shop3.repository.SaleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,12 @@ public class ShopService {
 
 	@Autowired  
 	private ItemRepository itemRepository;
+
+	@Autowired
+	private SaleRepository saleRepository;
+
+	@Autowired
+	private SaleItemRepository saleItemRepository;
 
 	public List<Item> itemList() {
 		return itemRepository.findAll();
@@ -84,28 +94,28 @@ public class ShopService {
 //		return sale;
 //	}
 //
-//	public List<Sale> saleList(String userid) {
-//
-//		// userid 사용자가 주문정보 목록
-//		List<Sale> list = saleDao.list(userid);
-//
-//		for (Sale s : list) {//Sale 순회
-//			// Sale객체 List<SaleItem>(주문상품모음리스트)에 데이터 할당.
-//
-//			// 1. saleitem의 saleid가 Sale의 saleid를 참조하므로
-//			//    saleid로 saleitem에서 데이터 가져옴
-//			List<SaleItem> saleItemList = saleItemDao.list(s.getSaleid());
-//			// 2. 주문상품을 모아둔saleItemList을 순회하며 Item정보를 조회하여 Item데이터 세팅
-//			for (SaleItem si : saleItemList) {
-//				Item item = itemDao.select(si.getItemid());
-//				si.setItem(item);
-//			}
-//			// 3. item정보를 세팅한 리스트를 각 Sale객체에 데이터 세팅
-//			s.setItemList(saleItemList);
-//		}
-//		return list;
-//	}
-//
+	public List<Sale> saleList(String userid) {
+
+		// userid 사용자가 주문정보 목록
+		List<Sale> list = saleRepository.findByUserUserid(userid);
+
+		for (Sale s : list) {//Sale 순회
+			// Sale객체 List<SaleItem>(주문상품모음리스트)에 데이터 할당.
+
+			// 1. saleitem의 saleid가 Sale의 saleid를 참조하므로
+			//    saleid로 saleitem에서 데이터 가져옴
+			List<SaleItem> saleItemList = saleItemRepository.findBySaleid(s.getSaleid());
+			// 2. 주문상품을 모아둔saleItemList을 순회하며 Item정보를 조회하여 Item데이터 세팅
+			for (SaleItem si : saleItemList) {
+				Item item = itemRepository.findById(si.getItemid());
+				si.setItem(item);
+			}
+			// 3. item정보를 세팅한 리스트를 각 Sale객체에 데이터 세팅
+			s.setItemList(saleItemList);
+		}
+		return list;
+	}
+
 //	public void exchangeCreate() {
 //		Document doc = null;
 //		List<List<String>> trlist = new ArrayList<List<String>>();

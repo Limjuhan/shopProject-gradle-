@@ -15,4 +15,5 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 	@Query("select coalesce(max(i.id),0) from Item i")
 	int findmaxId();
 
+	Item findById(int id);
 }

@@ -1,7 +1,12 @@
 package gradleProject.shop3.controller;
 
+import gradleProject.shop3.domain.Sale;
 import gradleProject.shop3.domain.User;
+import gradleProject.shop3.dto.UserDto;
+import gradleProject.shop3.mapper.UserMapper;
+import gradleProject.shop3.service.ShopService;
 import gradleProject.shop3.service.UserService;
+import gradleProject.shop3.util.CipherUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -14,18 +19,23 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.SecureRandom;
+import java.util.List;
 
 @Controller
 @RequestMapping("user")
 public class UserController {
 
 	@Autowired
-	private UserService service;
-//
-//	@Autowired
-//	private ShopService shopService;
+	private UserService userService;
+
+	@Autowired
+	private UserMapper userMapper;
+
+	@Autowired
+	private ShopService shopService;
 
 	// BoardController 의존성 제거 (필요 없는 경우)
     /*
@@ -64,7 +74,7 @@ public class UserController {
 	}
 
 	@PostMapping("join")
-	public String userAdd(@Valid User user, BindingResult bresult, Model model) {
+	public String userAdd(@Valid UserDto userDto, BindingResult bresult, Model model) {
 		model.addAttribute("title", "회원가입"); // 페이지 제목 설정
 
 		if(bresult.hasErrors()) {
@@ -73,7 +83,19 @@ public class UserController {
 		}
 
 		try {
-			service.userInsert(user);
+			// 1. 비밀번호 해쉬함수로 해쉬값으로 변경
+			// 2. 이메일을 암호화 처리
+			// userid의 해쉬값
+			// email 암호화
+			String cipherPass = CipherUtil.makehash(userDto.getPassword());
+			userDto.setPassword(cipherPass);
+			String cipherUserid = CipherUtil.makehash(userDto.getUserid());
+			String cipherEmail = CipherUtil.encrypt(userDto.getEmail(), cipherUserid);
+			userDto.setEmail(cipherEmail);
+
+			User user = userMapper.toEntity(userDto);
+
+			userService.userInsert(user);
 		} catch(DataIntegrityViolationException e) { // 키값 중복된 경우 (아이디 중복)
 			e.printStackTrace();
 			bresult.reject("error.duplicate.user", "이미 존재하는 아이디입니다."); // 아이디 중복 오류
@@ -87,51 +109,53 @@ public class UserController {
 		return "redirect:/user/login"; // 성공 시 로그인 페이지로 리다이렉트 (절대 경로)
 	}
 
-//	@PostMapping("login")
-//	public String login(@Valid User user, BindingResult bresult, Model model, HttpSession session) {
-//		model.addAttribute("title", "로그인"); // 페이지 제목 설정
-//
-//		// 사용자 ID 및 비밀번호 길이 검증
-//		if(user.getUserid().trim().length() < 3 || user.getUserid().trim().length() > 10) {
-//			bresult.rejectValue("userid", "error.required.userid", "아이디는 3~10자리여야 합니다.");
-//		}
-//		if(user.getPassword().trim().length() < 3 || user.getPassword().trim().length() > 10) {
-//			bresult.rejectValue("password", "error.required.password", "비밀번호는 3~10자리여야 합니다.");
-//		}
-//
-//		if(bresult.hasErrors()) { // 등록된 오류 존재?
-//			bresult.reject("error.input.check", "입력 값을 확인해 주세요."); // 전반적인 입력 확인 메시지
-//			return "user/login"; // 오류 발생 시 다시 user/login 뷰로
-//		}
-//
-//		User dbUser = service.selectUser(user.getUserid());
-//		if(dbUser == null) { // 아이디 없음
-//			bresult.reject("error.login.id", "존재하지 않는 아이디입니다.");
-//			return "user/login";
-//		}
-//
-//		if(user.getPassword().equals(dbUser.getPassword())) { // 비밀번호 일치
-//			session.setAttribute("loginUser", dbUser);
-//			return "redirect:/user/mypage?userid=" + user.getUserid(); // 마이페이지로 리다이렉트 (절대 경로)
-//		} else { // 비밀번호 불일치
-//			bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
-//			return "user/login";
-//		}
-//	}
-//
-//	@RequestMapping("mypage")
-//	public String idCheckMypage(@RequestParam("userid") String userid, Model model) {
-//		model.addAttribute("title", "내 정보"); // 페이지 제목 설정
-//
-//		User user = service.selectUser(userid);
-//		List<Sale> salelist = shopService.saleList(userid);
-//
-//		model.addAttribute("user", user);
-//		model.addAttribute("salelist", salelist);
-//
-//		return "user/mypage"; // user/mypage 뷰 반환
-//	}
-//
+	@PostMapping("login")
+	public String login(@Valid User user, BindingResult bresult, Model model, HttpSession session) {
+		model.addAttribute("title", "로그인"); // 페이지 제목 설정
+
+		// 사용자 ID 및 비밀번호 길이 검증
+		if(user.getUserid().trim().length() < 3 || user.getUserid().trim().length() > 10) {
+			bresult.rejectValue("userid", "error.required.userid", "아이디는 3~10자리여야 합니다.");
+		}
+		if(user.getPassword().trim().length() < 3 || user.getPassword().trim().length() > 10) {
+			bresult.rejectValue("password", "error.required.password", "비밀번호는 3~10자리여야 합니다.");
+		}
+
+		if(bresult.hasErrors()) { // 등록된 오류 존재?
+			bresult.reject("error.input.check", "입력 값을 확인해 주세요."); // 전반적인 입력 확인 메시지
+			return "user/login"; // 오류 발생 시 다시 user/login 뷰로
+		}
+
+		User dbUser = userService.selectUser(user.getUserid());
+
+		if(dbUser == null) { // 아이디 없음
+			bresult.reject("error.login.id", "존재하지 않는 아이디입니다.");
+			return "user/login";
+		}
+
+		if(user.getPassword().equals(dbUser.getPassword())) { // 비밀번호 일치
+			return "redirect:/user/mypage?userid=" + user.getUserid(); // 마이페이지로 리다이렉트 (절대 경로)
+		} else { // 비밀번호 불일치
+			bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
+			return "user/login";
+		}
+	}
+
+	@RequestMapping("mypage")
+	public String idCheckMypage(@RequestParam("userid") String userid, Model model) {
+		model.addAttribute("title", "내 정보"); // 페이지 제목 설정
+
+		User user = userService.selectUser(userid);
+		List<Sale> salelist = shopService.saleList(userid);
+		System.err.println("user확인" + user.toString());
+		System.err.println("salelist확인" + salelist.toString());
+
+		model.addAttribute("user", user);
+		model.addAttribute("salelist", salelist);
+
+		return "user/mypage"; // user/mypage 뷰 반환
+	}
+
 //	@RequestMapping("logout")
 //	public String logout(HttpSession session) {
 //		session.invalidate(); // 세션 무효화
@@ -324,4 +348,5 @@ public class UserController {
 		}
 		return sb.toString();
 	}
+
 }

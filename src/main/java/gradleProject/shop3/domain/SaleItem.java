@@ -1,22 +1,38 @@
 package gradleProject.shop3.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+@Entity
+@Table(name = "saleitem")
+@IdClass(SaleItemId.class)
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class SaleItem {// 주문상품
-	
+public class SaleItem {
+	@Id
 	private int saleid;
+
+	@Id
 	private int seq;
+
 	private int itemid;
+
 	private int quantity;
+
+	@ManyToOne
+	@JoinColumn(name = "id", insertable = false, updatable = false)
+	@Transient
 	private Item item;
-	
+
+	@ManyToOne
+	@JoinColumn(name = "saleid", insertable = false, updatable = false)
+	private Sale sale;
+
 	public SaleItem(int saleid, int seq, ItemSet itemSet) {
 		this.saleid = saleid;
 		this.seq = seq;
