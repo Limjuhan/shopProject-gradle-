@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layout/layout}">
+
+<head>
+	<title>회원 탈퇴</title>
+	<meta charset="UTF-8">
+	<th:block layout:fragment="css_js_head">
+	</th:block>
+</head>
+
+<body>
+<div layout:fragment="content">
+	<div class="container mt-4 mb-5">
+		<h2 class="mb-4 text-center text-danger">회원 탈퇴</h2>
+
+		<div class="card p-4 mb-4">
+			<h5 class="card-title text-center mb-3">회원 정보 확인</h5>
+			<table class="table table-bordered table-sm">
+				<tbody>
+				<tr>
+					<th class="bg-light w-25">아이디</th>
+					<td th:text="${user.userid}"></td>
+				</tr>
+				<tr>
+					<th class="bg-light w-25">이름</th>
+					<td th:text="${user.username}"></td>
+				</tr>
+				<tr>
+					<th class="bg-light w-25">생년월일</th>
+					<td th:text="${#dates.format(user.birthday, 'yyyy-MM-dd')}"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<form th:action="@{/user/delete}" th:object="${userDeleteDto}" method="post" name="deleteForm" class="needs-validation" novalidate>
+			<input type="hidden" name="userid" th:value="*{userid}">
+
+			<div class="mb-3 row align-items-center">
+				<label for="password" class="col-sm-2 col-form-label text-md-end">비밀번호</label>
+				<div class="col-sm-10">
+					<input type="password" name="password" id="password" class="form-control"
+						   placeholder="비밀번호를 입력하여 본인임을 확인하세요." required>
+					<div th:if="${#fields.hasErrors('password')}" class="text-danger small" th:errors="*{password}"></div>
+					<div th:if="${param.error}" class="text-danger small mt-1">
+						<p th:text="${param.error}"></p>
+					</div>
+				</div>
+			</div>
+
+			<div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger mt-3">
+				<p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+			</div>
+
+
+			<div class="text-center mt-4">
+				<a href="javascript:void(0);" onclick="confirmAndDelete();"
+				   class="btn btn-danger">회원탈퇴</a>
+				<a th:href="@{/user/mypage(userid=${user.userid})}" class="btn btn-secondary ms-2">취소</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<th:block layout:fragment="css_js_body">
+	<script type="text/javascript">
+		function confirmAndDelete() {
+			if (confirm('정말 회원 탈퇴하시겠습니까? 모든 데이터가 삭제됩니다.')) {
+				document.deleteForm.submit();
+			}
+		}
+	</script>
+</th:block>
+
+</body>
+</html>

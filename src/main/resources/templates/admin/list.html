@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>회원 목록</title>
+    <meta charset="UTF-8">
+    <th:block layout:fragment="css_js_head">
+    </th:block>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container my-5">
+        <h2 class="mb-4"><i class="bi bi-people-fill"></i> 회원 목록</h2>
+
+        <form th:action="@{/admin/mail}" method="get">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-hover align-middle text-center">
+                        <thead class="table-dark">
+                        <tr>
+                            <th style="width: 5%;"><input class="form-check-input" type="checkbox" onchange="allchkbox(this)"></th>
+                            <th style="width: 15%;">아이디</th>
+                            <th style="width: 15%;">이름</th>
+                            <th style="width: 20%;">이메일</th>
+                            <th style="width: 15%;">전화번호</th>
+                            <th style="width: 10%;">생년월일</th>
+                            <th style="width: 20%;">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${list}">
+                            <td><input class="form-check-input idchks" type="checkbox" name="idchks" th:value="${user.userid}"></td>
+                            <td th:text="${user.userid}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.phoneno}"></td>
+                            <td th:text="${#dates.format(user.birthday, 'yy-MM-dd')}"></td>
+                            <td>
+                                <a th:href="@{/user/mypage(userid=${user.userid})}" class="btn btn-sm btn-outline-secondary">정보</a>
+                                <a th:href="@{/user/update(userid=${user.userid})}" class="btn btn-sm btn-primary">수정</a>
+                                <a th:href="@{/user/delete(userid=${user.userid})}" class="btn btn-sm btn-danger">강제탈퇴</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(list)}">
+                            <td colspan="7">등록된 회원이 없습니다.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-3 text-end">
+                <button type="submit" class="btn btn-success"><i class="bi bi-envelope-fill"></i> 선택 회원에게 메일 보내기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block layout:fragment="css_js_body">
+    <script type="text/javascript">
+        // 전체 체크박스 선택/해제 함수
+        function allchkbox(allChk) {
+            document.querySelectorAll('.idchks').forEach(chk => {
+                chk.checked = allChk.checked;
+            });
+        }
+    </script>
+</th:block>
+
+</body>
+</html>

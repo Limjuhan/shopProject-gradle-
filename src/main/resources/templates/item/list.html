@@ -72,7 +72,7 @@
                 </a>
             </div>
             <div class="d-flex gap-2">
-                <a th:href="@{/user/mypage(userid=${loginUser?.userId})}" class="btn btn-primary btn-custom">
+                <a th:href="@{/user/mypage(userid=${session.loginUser?.userid})}" class="btn btn-primary btn-custom">
                     <i class="bi bi-person"></i> MyPage
                 </a>
                 <a th:href="@{/cart/cartView}" class="btn btn-success btn-custom">

@@ -99,7 +99,7 @@ public class ItemController {
 		HttpServletRequest request, Model model) { // Model 추가
 	 if(bresult.hasErrors()) {
 		model.addAttribute("title", "상품 수정 오류");
-		return "item/update"; // resources/templates/item/update.html
+		return "item/update"; // resources/templates/item/update-account.html
 	 }
 	 Item item = itemMapper.toEntity(itemDto);
 	 service.itemUpdate(item,request);

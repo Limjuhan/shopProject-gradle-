@@ -137,6 +137,8 @@ public class CipherUtil {
         try {
             Key genKey = new SecretKeySpec(makeKey(key), "AES");
             AlgorithmParameterSpec paramSpec = new IvParameterSpec(iv);
+            System.err.println("genKey = "+genKey);
+            System.err.println("paramSpec = " + paramSpec);
             cipher.init(Cipher.DECRYPT_MODE, genKey, paramSpec);
             plainMsg= cipher.doFinal(hexToByte(cipher1.trim()));
         } catch (Exception e) {
