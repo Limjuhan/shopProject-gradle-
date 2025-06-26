@@ -36,16 +36,8 @@ public class UserController {
     @Autowired
     private ShopService shopService;
 
-    // BoardController 의존성 제거 (필요 없는 경우)
-    /*
-    private final BoardController boardController;
-    UserController(BoardController boardController) {
-        this.boardController = boardController;
-    }
-    */
-
-    @GetMapping("*")
-    public String form(Model model, HttpSession session, HttpServletRequest request) {
+    @GetMapping("login")
+    public String loginForm(Model model, HttpSession session, HttpServletRequest request) {
         User loginUser = (User) session.getAttribute("loginUser");
 
         // 로그인 상태인 경우 마이페이지로 리다이렉트
@@ -53,31 +45,74 @@ public class UserController {
             return "redirect:/user/mypage?userid=" + loginUser.getUserid();
         }
 
-        // 현재 요청 경로에 따라 적절한 뷰 설정 (더 명확하게 분리하는 것이 좋음)
-        // 예를 들어, /user/join 요청은 user/join 뷰, /user/login 요청은 user/login 뷰
-        String requestURI = request.getRequestURI();
-        if (requestURI.endsWith("/user/join")) {
-            model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
-            model.addAttribute("title", "회원가입");
-            return "user/join-account";
-        } else if (requestURI.endsWith("/user/login")) {
-            model.addAttribute("user", new User()); // 폼 바인딩용 User 객체
-            model.addAttribute("title", "로그인");
-            return "user/login";
-        } else {
-            // 그 외의 * 요청에 대한 기본 처리
-            model.addAttribute("user", new User());
-            return "";
-        }
+        model.addAttribute("user", new User());
+        model.addAttribute("title", "하나도너츠");
+
+        return "user/login";
     }
+
+    @PostMapping("login")
+    public String login(@Valid User user,
+                        BindingResult bresult,
+                        Model model, HttpSession session) {
+
+        model.addAttribute("title", "하나도너츠");
+
+        if (user.getUserid().trim().length() < 3 || user.getUserid().trim().length() > 10) {
+            bresult.rejectValue("userid", "error.required.userid", "아이디는 3~10자리여야 합니다.");
+        }
+        if (user.getPassword().trim().length() < 3 || user.getPassword().trim().length() > 10) {
+            bresult.rejectValue("password", "error.required.password", "비밀번호는 3~10자리여야 합니다.");
+        }
+
+        if (bresult.hasErrors()) {
+            bresult.reject("error.input.check");
+            return "user/login";
+        }
+
+        User dbUser = userService.selectUser(user.getUserid());
+        if (dbUser == null) {
+            bresult.reject("error.login.id", "존재하지 않는 아이디입니다.");
+            return "user/login";
+        }
+
+        try {
+            if (CipherUtil.makehash(user.getPassword()).equals(dbUser.getPassword())) { // 비밀번호 일치
+                session.setAttribute("loginUser", dbUser);
+                return "redirect:/user/mypage?userid=" + user.getUserid();
+            } else { // 비밀번호 불일치
+                bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
+                return "user/login";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GetMapping("join")
+    public String joinForm(Model model, HttpSession session, HttpServletRequest request) {
+        User loginUser = (User) session.getAttribute("loginUser");
+
+        // 로그인 상태인 경우 마이페이지로 리다이렉트
+        if (loginUser != null && StringUtils.hasText(loginUser.getUserid())) {
+            return "redirect:/user/mypage?userid=" + loginUser.getUserid();
+        }
+
+        model.addAttribute("user", new UserDto());
+        model.addAttribute("title", "회원가입");
+
+        return "user/join-account";
+    }
+
 
     @PostMapping("join")
     public String userAdd(@Valid UserDto userDto, BindingResult bresult, Model model) {
-        model.addAttribute("title", "회원가입"); // 페이지 제목 설정
+        model.addAttribute("title", "회원가입");
 
         if (bresult.hasErrors()) {
-            bresult.reject("error.input.user", "입력 값을 확인해 주세요."); // 전반적인 입력 오류
-            return "user/join-account"; // 오류 발생 시 다시 user/join 뷰로
+            bresult.reject("error.input.user", "입력 값을 확인해 주세요.");
+            return "user/join-account";
         }
 
         try {
@@ -99,53 +134,14 @@ public class UserController {
         return "redirect:/user/login";
     }
 
-
-
-    @PostMapping("login")
-    public String login(@Valid User user, BindingResult bresult, Model model, HttpSession session) {
-        model.addAttribute("title", "로그인"); // 페이지 제목 설정
-
-        // 사용자 ID 및 비밀번호 길이 검증
-        if (user.getUserid().trim().length() < 3 || user.getUserid().trim().length() > 10) {
-            bresult.rejectValue("userid", "error.required.userid", "아이디는 3~10자리여야 합니다.");
-        }
-        if (user.getPassword().trim().length() < 3 || user.getPassword().trim().length() > 10) {
-            bresult.rejectValue("password", "error.required.password", "비밀번호는 3~10자리여야 합니다.");
-        }
-
-        if (bresult.hasErrors()) { // 등록된 오류 존재?
-            bresult.reject("error.input.check", "입력 값을 확인해 주세요."); // 전반적인 입력 확인 메시지
-            return "user/login"; // 오류 발생 시 다시 user/login 뷰로
-        }
-
-        User dbUser = userService.selectUser(user.getUserid());
-        if (dbUser == null) { // 아이디 없음
-            bresult.reject("error.login.id", "존재하지 않는 아이디입니다.");
-            return "user/login";
-        }
-
-        try {
-            if (CipherUtil.makehash(user.getPassword()).equals(dbUser.getPassword())) { // 비밀번호 일치
-                session.setAttribute("loginUser", dbUser);
-                return "redirect:/user/mypage?userid=" + user.getUserid();
-            } else { // 비밀번호 불일치
-                bresult.reject("error.login.password", "비밀번호가 일치하지 않습니다.");
-                return "user/login";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @RequestMapping("mypage")
     public String idCheckMypage(Model model, @RequestParam("userid") String userid, HttpSession session) {
-        model.addAttribute("title", "내 정보"); // 페이지 제목 설정
+        model.addAttribute("title", "내 정보");
 
         User user = userService.selectUser(userid);
         user.setEmail(userService.decryptEmail(user));
         List<Sale> salelist = shopService.saleList(userid);
-        System.err.println("salelist = " + salelist);
+
         model.addAttribute("user", user);
         model.addAttribute("salelist", salelist);
 
@@ -193,6 +189,7 @@ public class UserController {
             userService.encryptEmail(userDto);
             User user = userMapper.toEntity(userDto);
             userService.userUpdate(user);
+            // 관리자가 회원정보 수정할수있기 때문에 세션 업데이트시 확인
             if (loginUser.getUserid().equals(user.getUserid())) {
                 session.setAttribute("loginUser", user); // 수정된 정보로 세션 업데이트
             }

@@ -23,7 +23,7 @@
         }
 
         .error-card {
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.75);
             padding: 40px;
             border-radius: 15px;
             max-width: 600px;
@@ -42,13 +42,12 @@
             margin-bottom: 30px;
         }
 
-        .btn-home, .btn-back {
+        .btn-redirect {
             background-color: #ff5e57;
             border: none;
-            margin: 5px;
         }
 
-        .btn-home:hover, .btn-back:hover {
+        .btn-redirect:hover {
             background-color: #ff3f3f;
         }
     </style>
@@ -59,14 +58,8 @@
     <h1>문제가 발생했어요</h1>
     <p th:text="${message} ?: '죄송합니다. 요청하신 페이지를 처리하는 중 오류가 발생했습니다.'"></p>
     <div>
-        <button class="btn btn-back btn-lg text-white" onclick="history.back()">
-            <i class="bi bi-arrow-left-circle"></i> 이전 페이지
-        </button>
-        <a th:if="${url}" th:href="${url}" class="btn btn-redirect btn-lg text-white">
+        <a th:href="${url} ?: @{/}" class="btn btn-redirect btn-lg text-white">
             <i class="bi bi-arrow-right-circle"></i> 이동하기
-        </a>
-        <a th:href="@{/}" class="btn btn-home btn-lg text-white">
-            <i class="bi bi-house-door-fill"></i> 홈으로
         </a>
     </div>
 </div>

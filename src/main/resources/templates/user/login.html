@@ -74,7 +74,7 @@
         }
 
         .error-message {
-            color: #ffc9c9;
+            color: #ff6666;
             font-size: 0.875rem;
         }
 
@@ -94,6 +94,7 @@
     <div class="card p-4">
         <h2 class="page-title text-center">사용자 로그인</h2>
         <form th:object="${user}" th:action="@{/user/login}" method="post" name="loginform">
+
             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger error-message" role="alert">
                 <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
             </div>

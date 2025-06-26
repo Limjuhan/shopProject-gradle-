@@ -1,6 +1,7 @@
 package gradleProject.shop3.mapper;
 
 import gradleProject.shop3.domain.User;
+import gradleProject.shop3.dto.UserDisplayDto;
 import gradleProject.shop3.dto.UserDto;
 import org.mapstruct.Mapper;
 
@@ -8,4 +9,7 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     User toEntity(UserDto userDto);
     UserDto toDto(User user);
+
+    UserDisplayDto toDisplayDto(User user);
+    User toEntity(UserDisplayDto userDisplayDto);
 }

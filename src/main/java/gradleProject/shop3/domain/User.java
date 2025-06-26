@@ -28,7 +28,6 @@ public class User {
 	private String phoneno;
 	private String postcode;
 	private String address;
-	@Column(name = "email")
 	private String email;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date birthday;
